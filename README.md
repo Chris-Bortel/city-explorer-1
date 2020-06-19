@@ -30,6 +30,6 @@ Will be using JavaScript, Heroku, Node, NPM, Express, dotenv, cors.
 
 ## Lab6 Weather Data
 - Estimate of time needed to complete:  6 Hours
-- Start time: 
+- Start time: 5:30pm
 - Finish time: 
 - Actual time needed to complete: 
