@@ -17,16 +17,15 @@ app.use(cors());
 //  Location
 app.get('/location', (request, response) => {
   let data = require('./data/location.json');
-  let actualData = new Location(data[0], request);
-  // actualData['search_query'] = request.query.city;
+  let actualData = new Location(data[0], request.query.city);
   response.status(200).json(actualData);
 });
 
-function Location(obj, request) {
+function Location(obj, city) {
   this.formatted_query = obj.display_name;
   this.latitude = obj.lat;
   this.longitude = obj.lon;
-  this.search_query = request.query.city;
+  this.search_query = city;
 }
 
 // Weather
