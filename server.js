@@ -51,7 +51,11 @@ app.use('*', (request, response) => {
 
 app.use((error, request, response, next) => {
   console.log(error);
-  response.status(500).send('server is broken');
+  let errorMsg = {
+    status: 500,
+    responseText: 'Sorry, something went wrong'
+  };
+  response.status(500).json(errorMsg);
 });
 
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
