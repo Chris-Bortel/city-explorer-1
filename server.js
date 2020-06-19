@@ -21,5 +21,13 @@ app.get('/location', (request, response) => {
 
 
 app.use('*', (request, response) => {
-  response.status(404).send('Huh')
-})
+  response.status(404).send('Huh');
+});
+
+app.use((error, request, response, next) => {
+  console.log(error);
+  response.status(500).send('server is broken');
+});
+
+app.listen(PORT, () => console.log('Server is running on port ', PORT));
+
