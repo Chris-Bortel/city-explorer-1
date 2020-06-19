@@ -17,15 +17,15 @@ app.use(cors());
 //  Location
 app.get('/location', (request, response) => {
   let data = require('./data/location.json');
-  let actualData = new Location(data[0]);
-  actualData.search_query = request.query.city;
+  let actualData = new Location(data[0], request.query.city);
   response.status(200).json(actualData);
 });
 
-function Location(obj) {
+function Location(obj, city) {
   this.formatted_query = obj.display_name;
   this.latitude = obj.lat;
   this.longitude = obj.lon;
+  this.search_query = city;
 }
 
 // Weather
@@ -46,13 +46,21 @@ function Forecast(obj) {
 
 
 app.use('*', (request, response) => {
-  response.status(404).send('Huh');
+  let errorMsg = {
+    status: 500,
+    responseText: 'Sorry, something went wrong'
+  };
+  response.status(500).json(errorMsg);
 });
 
-app.use((error, request, response, next) => {
-  console.log(error);
-  response.status(500).send('server is broken');
-});
+// app.use((error, request, response, next) => {
+//   console.log(error);
+//   let errorMsg = {
+//     status: 500,
+//     responseText: 'Sorry, something went wrong'
+//   };
+//   response.status(500).json(errorMsg);
+// });
 
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
