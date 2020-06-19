@@ -46,17 +46,21 @@ function Forecast(obj) {
 
 
 app.use('*', (request, response) => {
-  response.status(404).send('Huh');
-});
-
-app.use((error, request, response, next) => {
-  console.log(error);
   let errorMsg = {
     status: 500,
     responseText: 'Sorry, something went wrong'
   };
   response.status(500).json(errorMsg);
 });
+
+// app.use((error, request, response, next) => {
+//   console.log(error);
+//   let errorMsg = {
+//     status: 500,
+//     responseText: 'Sorry, something went wrong'
+//   };
+//   response.status(500).json(errorMsg);
+// });
 
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
