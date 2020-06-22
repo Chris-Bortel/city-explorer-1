@@ -1,17 +1,24 @@
 'use strict';
 
-// import dotenv, express, cors
-require('dotenv').config();
+// Bring in npm libraries
 const express = require('express');
 const cors = require('cors');
+const superagent = require('superagent');
 
-// Anything from .env file shows up here
-const PORT = process.env.PORT;
+// Bring in dotenv package to let us talk to our .env file
+require('dotenv').config();
+
+// Grab port number from .env file
+const PORT = process.env.PORT || 3000;
 
 // Get an instance of express as our app
 const app = express();
 
+// Enable Cors
 app.use(cors());
+
+// Initialize
+app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
 //  Location
 app.get('/location', (request, response) => {
@@ -57,5 +64,3 @@ app.use('*', (request, response) => {
 //   };
 //   response.status(500).json(errorMsg);
 // });
-
-app.listen(PORT, () => console.log('Server is running on port ', PORT));
