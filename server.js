@@ -20,11 +20,23 @@ app.use(cors());
 // Initialize
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
+app.get('/', (request, response) => {
+  response.send('Hello World again. Initial route');
+});
+
 //  Location
 app.get('/location', (request, response) => {
-  let data = require('./data/location.json');
-  let actualData = new Location(data[0], request.query.city);
-  response.status(200).json(actualData);
+  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
+
+  superagent
+    .get(API)
+    .then((data) => {
+      let location = new Location(data.body[0], request.query.city);
+      response.status(200).json(location);
+    })
+    .catch(() => {
+      response.status(500).send('Something went wrong in location route');
+    });
 });
 
 function Location(obj, city) {
@@ -55,12 +67,3 @@ app.use('*', (request, response) => {
   };
   response.status(500).json(errorMsg);
 });
-
-// app.use((error, request, response, next) => {
-//   console.log(error);
-//   let errorMsg = {
-//     status: 500,
-//     responseText: 'Sorry, something went wrong'
-//   };
-//   response.status(500).json(errorMsg);
-// });
