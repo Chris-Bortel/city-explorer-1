@@ -13,7 +13,6 @@ const app = express();
 
 app.use(cors());
 
-
 //  Location
 app.get('/location', (request, response) => {
   let data = require('./data/location.json');
@@ -31,24 +30,21 @@ function Location(obj, city) {
 // Weather
 app.get('/weather', (request, response) => {
   let weatherData = require('./data/weather.json');
-  let weekPrediction = [];
-  weatherData.data.forEach(day => {
-    let forecast = new Forecast(day);
-    weekPrediction.push(forecast);
+  let weekPrediction = weatherData.data.map((day) => {
+    return new Forecast(day);
   });
   response.status(200).json(weekPrediction);
 });
 
 function Forecast(obj) {
   this.forecast = obj.weather.description;
-  this.time = obj.datetime;
+  this.time = new Date(obj.datetime).toDateString();
 }
-
 
 app.use('*', (request, response) => {
   let errorMsg = {
     status: 500,
-    responseText: 'Sorry, something went wrong'
+    responseText: 'Sorry, something went wrong',
   };
   response.status(500).json(errorMsg);
 });
@@ -63,4 +59,3 @@ app.use('*', (request, response) => {
 // });
 
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
-
