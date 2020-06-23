@@ -48,11 +48,16 @@ function Location(obj, city) {
 
 // Weather
 app.get('/weather', (request, response) => {
-  let weatherData = require('./data/weather.json');
-  let weekPrediction = weatherData.data.map((day) => {
-    return new Forecast(day);
+  // let weatherData = require('./data/weather.json');
+  const API = `https://api.weatherbit.io/v2.0/current?city=Raleigh,NC&key=${process.env.WEATHER_API_KEY}`;
+
+  superagent.get(API).then((data) => {
+    console.log(data);
+    response.status(200).json(data);
   });
-  response.status(200).json(weekPrediction);
+
+  // let weekPrediction = weatherData.data.map((day) => {
+  //   return new Forecast(day);
 });
 
 function Forecast(obj) {
