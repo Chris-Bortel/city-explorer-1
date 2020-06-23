@@ -34,10 +34,10 @@ app.get('/location', (request, response) => {
     .get(API)
     .then((data) => {
       let location = new Location(data.body[0], request.query.city);
-      response.status(200).json(location);
+      response.status(200).send(location);
     })
     .catch(() => {
-      response.status(500).json('Something went wrong in Location Route');
+      response.status(500).send('Something went wrong in LOCATION Route');
     });
 });
 
@@ -59,10 +59,10 @@ app.get('/weather', (request, response) => {
     .then((data) => {
       let weatherDataArr = JSON.parse(data.text).data;
       let weatherForcast = weatherDataArr.map((day) => new Forecast(day));
-      response.status(200).json(weatherForcast);
+      response.status(200).send(weatherForcast);
     })
     .catch(() => {
-      response.status(500).json('Something went wrong in Weather Route');
+      response.status(500).send('Something went wrong in WEATHER Route');
     });
 });
 
@@ -82,10 +82,10 @@ app.get('/trails', (request, response) => {
     .then((data) => {
       let trailsDataArr = JSON.parse(data.text).trails;
       let trailsRefactored = trailsDataArr.map(trail => new Trails(trail));
-      response.status(200).json(trailsRefactored);
+      response.status(200).send(trailsRefactored);
     })
     .catch(() => {
-      response.status(500).json('Something wrong with Trails Route');
+      response.status(500).send('Something wrong with TRAILS Route');
     });
 });
 
