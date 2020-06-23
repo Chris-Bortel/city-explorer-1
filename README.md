@@ -46,9 +46,10 @@ June 18 10:00pm - Application now has functional express server.
 - Finish time: 10pm
 - Actual time needed to complete: 4.5 Hours
 
+
 ## Lab7 API
 
-- Estimate of time needed to complete: 6 Hours
-- Start time: 5:30pm
-- Finish time: 10pm
-- Actual time needed to complete: 4.5 Hours
+- Estimate of time needed to complete: 8 Hours
+- Start time: 1pm
+- Finish time: 9pm
+- Actual time needed to complete: 8 Hours
