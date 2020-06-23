@@ -26,7 +26,6 @@ app.get('/', (request, response) => {
 
 //  Location
 app.get('/location', (request, response) => {
-
   const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   superagent
@@ -47,10 +46,10 @@ function Location(obj, city) {
   this.search_query = city;
 }
 
+
 // Weather
 app.get('/weather', (request, response) => {
-  console.log(request);
-  const API = `https://api.weatherbit.io/v2.0/forecast/daily?&city=${request.query.search_query}&country=US&key=${process.env.WEATHER_API_KEY}`;
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.WEATHER_API_KEY}`;
 
   superagent
     .get(API)
@@ -70,6 +69,11 @@ function Forecast(obj) {
   this.forecast = obj.weather.description;
   this.time = new Date(obj.datetime).toDateString();
 }
+
+
+
+
+
 
 app.use('*', (request, response) => {
   let errorMsg = {
