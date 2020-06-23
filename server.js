@@ -26,16 +26,17 @@ app.get('/', (request, response) => {
 
 //  Location
 app.get('/location', (request, response) => {
+
   const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   superagent
     .get(API)
     .then((data) => {
       let location = new Location(data.body[0], request.query.city);
-      response.status(200).json(location);
+      response.status(200).send(location);
     })
     .catch(() => {
-      response.status(500).send('Something went wrong in location route');
+      response.status(500).send('Something went wrong in Location Route');
     });
 });
 
@@ -48,16 +49,21 @@ function Location(obj, city) {
 
 // Weather
 app.get('/weather', (request, response) => {
-  // let weatherData = require('./data/weather.json');
-  const API = `https://api.weatherbit.io/v2.0/current?city=Raleigh,NC&key=${process.env.WEATHER_API_KEY}`;
+  console.log(request);
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily?&city=${request.query.search_query}&country=US&key=${process.env.WEATHER_API_KEY}`;
 
-  superagent.get(API).then((data) => {
-    console.log(data);
-    response.status(200).json(data);
-  });
-
-  // let weekPrediction = weatherData.data.map((day) => {
-  //   return new Forecast(day);
+  superagent
+    .get(API)
+    .then((data) => {
+      let weatherData = JSON.parse(data.text).data;
+      let weatherForcast = weatherData.map((day) => {
+        return new Forecast(day);
+      });
+      response.status(200).send(weatherForcast);
+    })
+    .catch(() => {
+      response.status(500).send('Something went wrong in Weather Route');
+    });
 });
 
 function Forecast(obj) {
