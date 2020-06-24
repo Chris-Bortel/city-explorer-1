@@ -20,13 +20,14 @@ app.use(cors());
 // Initialize
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
+
+////////////////   Routes   ////////////////
 app.get('/', (request, response) => {
   response.json('Hello World again. Initial route');
 });
 
 
-
-///////////  Location  ////////////////
+////////////////  Location  ////////////////
 app.get('/location', (request, response) => {
   const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
@@ -49,8 +50,7 @@ function Location(obj, city) {
 }
 
 
-
-//////////   Weather   ///////////////
+////////////////    Weather    ///////////////
 app.get('/weather', (request, response) => {
   const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.WEATHER_API_KEY}`;
 
@@ -72,8 +72,7 @@ function Forecast(obj) {
 }
 
 
-
-//////////   Trails   ////////////////
+////////////////    Trails    ////////////////
 app.get('/trails', (request, response) => {
   const API = `https://www.hikingproject.com/data/get-trails?lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.TRAIL_API_KEY}`;
 
