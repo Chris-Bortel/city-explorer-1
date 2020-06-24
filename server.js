@@ -33,8 +33,8 @@ app.get('/location', (request, response) => {
 
   superagent
     .get(API)
-    .then((data) => {
-      let location = new Location(data.body[0], request.query.city);
+    .then((apiData) => {
+      let location = new Location(apiData.body[0], request.query.city);
       response.status(200).send(location);
     })
     .catch(() => {
@@ -56,8 +56,10 @@ app.get('/weather', (request, response) => {
 
   superagent
     .get(API)
-    .then((data) => {
-      let weatherDataArr = JSON.parse(data.text).data;
+    .then((apiData) => {
+      // let weatherDataArr = JSON.parse(data.text).data;
+      // console.log(apiData.body);
+      let weatherDataArr = apiData.body.data;
       let weatherForcast = weatherDataArr.map((day) => new Forecast(day));
       response.status(200).send(weatherForcast);
     })
@@ -78,8 +80,8 @@ app.get('/trails', (request, response) => {
 
   superagent
     .get(API)
-    .then((data) => {
-      let trailsDataArr = JSON.parse(data.text).trails;
+    .then((apiData) => {
+      let trailsDataArr = apiData.body.trails;
       let trailsRefactored = trailsDataArr.map(trail => new Trails(trail));
       response.status(200).send(trailsRefactored);
     })
