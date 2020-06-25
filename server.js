@@ -38,12 +38,21 @@ function handleHomePage(request, response) {
 
 /////////////////   Location
 function handleLocation(request, response) {
+  if (locations[request.query.city]) {
+    response.status(200).send(locations[request.query.city]);
+  } else {
+    fetchLocationDataFromAPI(request.query.city, response);
+  }
+}
+
+
+function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
   // query string :   ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
-    q: request.query.city,
+    q: city,
     format: 'json'
   };
 
@@ -51,7 +60,7 @@ function handleLocation(request, response) {
     .get(API)
     .query(queryObject)
     .then((apiData) => {
-      let location = new Location(apiData.body[0], request.query.city);
+      let location = new Location(apiData.body[0], city);
       response.status(200).send(location);
     })
     .catch(() => {
@@ -70,7 +79,6 @@ function Location(obj, city) {
 //////////////////    Weather
 function handleWeather(request, response) {
   const API = `https://api.weatherbit.io/v2.0/forecast/daily`;
-  // query string:    ?&lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.WEATHER_API_KEY};
 
   let queryObject = {
     lat: request.query.latitude,
@@ -100,7 +108,6 @@ function Forecast(obj) {
 ///////////////////    Trails
 function handleTrails(request, response) {
   const API = `https://www.hikingproject.com/data/get-trails`;
-  // query string:  ?lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.TRAIL_API_KEY}
 
   let queryobject = {
     lat: request.query.latitude,
