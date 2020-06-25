@@ -17,30 +17,56 @@ const app = express();
 // Enable Cors
 app.use(cors());
 
-// Initialize
+// Declare Routes
+app.get('/', handleHomePage);
+app.get('/location', handleLocation);
+app.get('/weather', handleWeather);
+app.get('/trails', handleTrails);
+
+
+// Initialize the server
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
+// In Memory Cache
+let locations = {};
 
-////////////////   Routes   ////////////////
-app.get('/', (request, response) => {
-  response.json('Hello World again. Initial route');
-});
+////////////////    Home Page
+function handleHomePage(request, response) {
+  response.send('Hello World again. Initial route');
+}
 
 
-////////////////  Location  ////////////////
-app.get('/location', (request, response) => {
-  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
+/////////////////   Location
+function handleLocation(request, response) {
+  if (locations[request.query.city]) {
+    response.status(200).send(locations[request.query.city]);
+  } else {
+    fetchLocationDataFromAPI(request.query.city, response);
+  }
+}
+
+
+function fetchLocationDataFromAPI(city, response) {
+  const API = `https://us1.locationiq.com/v1/search.php`;
+  // query string :   ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json;
+
+  let queryObject = {
+    key: process.env.GEOCODE_API_KEY,
+    q: city,
+    format: 'json'
+  };
 
   superagent
     .get(API)
+    .query(queryObject)
     .then((apiData) => {
-      let location = new Location(apiData.body[0], request.query.city);
+      let location = new Location(apiData.body[0], city);
       response.status(200).send(location);
     })
     .catch(() => {
       response.status(500).send('Something went wrong in LOCATION Route');
     });
-});
+}
 
 function Location(obj, city) {
   this.formatted_query = obj.display_name;
@@ -50,15 +76,20 @@ function Location(obj, city) {
 }
 
 
-////////////////    Weather    ///////////////
-app.get('/weather', (request, response) => {
-  const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.WEATHER_API_KEY}`;
+//////////////////    Weather
+function handleWeather(request, response) {
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily`;
+
+  let queryObject = {
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+    key: process.env.WEATHER_API_KEY
+  };
 
   superagent
     .get(API)
+    .query(queryObject)
     .then((apiData) => {
-      // let weatherDataArr = JSON.parse(data.text).data;
-      // console.log(apiData.body);
       let weatherDataArr = apiData.body.data;
       let weatherForcast = weatherDataArr.map((day) => new Forecast(day));
       response.status(200).send(weatherForcast);
@@ -66,7 +97,7 @@ app.get('/weather', (request, response) => {
     .catch(() => {
       response.status(500).send('Something went wrong in WEATHER Route');
     });
-});
+}
 
 function Forecast(obj) {
   this.forecast = obj.weather.description;
@@ -74,12 +105,19 @@ function Forecast(obj) {
 }
 
 
-////////////////    Trails    ////////////////
-app.get('/trails', (request, response) => {
-  const API = `https://www.hikingproject.com/data/get-trails?lat=${request.query.latitude}&lon=${request.query.longitude}&key=${process.env.TRAIL_API_KEY}`;
+///////////////////    Trails
+function handleTrails(request, response) {
+  const API = `https://www.hikingproject.com/data/get-trails`;
+
+  let queryobject = {
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+    key: process.env.TRAIL_API_KEY
+  };
 
   superagent
     .get(API)
+    .query(queryobject)
     .then((apiData) => {
       let trailsDataArr = apiData.body.trails;
       let trailsRefactored = trailsDataArr.map(trail => new Trails(trail));
@@ -88,7 +126,7 @@ app.get('/trails', (request, response) => {
     .catch(() => {
       response.status(500).send('Something wrong with TRAILS Route');
     });
-});
+}
 
 function Trails(obj) {
   this.name = obj.name;
