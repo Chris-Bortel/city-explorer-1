@@ -22,7 +22,8 @@ app.get('/', handleHomePage);
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails', handleTrails);
-
+app.use('*', handleNotFound);
+app.use(errorHandler);
 
 // Initialize the server
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
@@ -45,10 +46,8 @@ function handleLocation(request, response) {
   }
 }
 
-
 function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
-  // query string :   ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
@@ -61,6 +60,7 @@ function fetchLocationDataFromAPI(city, response) {
     .query(queryObject)
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
+      locations[city] = location;
       response.status(200).send(location);
     })
     .catch(() => {
@@ -142,10 +142,10 @@ function Trails(obj) {
 }
 
 
-app.use('*', (request, response) => {
-  let errorMsg = {
-    status: 500,
-    responseText: 'Sorry, something went wrong',
-  };
-  response.status(500).json(errorMsg);
-});
+function handleNotFound(request, response) {
+  response.status(404).send('Route not present');
+}
+
+function errorHandler(error, request, response) {
+  response.status(500).send(error);
+}
