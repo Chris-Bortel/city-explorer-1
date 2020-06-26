@@ -4,6 +4,8 @@
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg');
+const { response } = require('express');
 
 // Bring in dotenv package to let us talk to our .env file
 require('dotenv').config();
@@ -13,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 // Get an instance of express as our app
 const app = express();
+const client = new pg.Client(process.env.DATABASE_URL);
 
 // Enable Cors
 app.use(cors());
@@ -22,9 +25,22 @@ app.get('/', handleHomePage);
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails', handleTrails);
+app.use('*', handleNotFound);
+app.use(errorHandler);
+
+// Initialize the server if database gets connected
+client.connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is up on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    throw `Postgress startup error: ${err.message}`;
+  });
 
 
-// Initialize the server
+
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
 // In Memory Cache
@@ -45,10 +61,8 @@ function handleLocation(request, response) {
   }
 }
 
-
 function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
-  // query string :   ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
@@ -61,6 +75,7 @@ function fetchLocationDataFromAPI(city, response) {
     .query(queryObject)
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
+      locations[city] = location;
       response.status(200).send(location);
     })
     .catch(() => {
@@ -142,10 +157,10 @@ function Trails(obj) {
 }
 
 
-app.use('*', (request, response) => {
-  let errorMsg = {
-    status: 500,
-    responseText: 'Sorry, something went wrong',
-  };
-  response.status(500).json(errorMsg);
-});
+function handleNotFound(request, response) {
+  response.status(404).send('Route not present');
+}
+
+function errorHandler(error, request, response) {
+  response.status(500).send(error);
+}
