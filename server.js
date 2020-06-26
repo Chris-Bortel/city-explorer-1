@@ -51,12 +51,23 @@ function handleHomePage(request, response) {
 
 /////////////////   Location
 function handleLocation(request, response) {
+  // if city is present in our database
   if (locations[request.query.city]) {
+    // send database location information
     response.status(200).send(locations[request.query.city]);
   } else {
     fetchLocationDataFromAPI(request.query.city, response);
   }
 }
+
+function checkLocationInDatabase(city) {
+  // if city is present
+  // return city object
+  // else 
+  // return false
+}
+
+
 
 
 function fetchLocationDataFromAPI(city, response) {
@@ -73,6 +84,8 @@ function fetchLocationDataFromAPI(city, response) {
     .query(queryObject)
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
+      // locations[city] = location;
+      // add city info to our database
       response.status(200).send(location);
     })
     .catch(() => {
