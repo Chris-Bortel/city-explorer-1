@@ -152,10 +152,10 @@ function Trails(obj) {
 }
 
 
-app.use('*', (request, response) => {
-  let errorMsg = {
-    status: 500,
-    responseText: 'Sorry, something went wrong',
-  };
-  response.status(500).json(errorMsg);
-});
+function handleNotFound(request, response) {
+  response.status(404).send('Route not found');
+}
+
+function errorHandler(error, request, response) {
+  response.status(500).send(error);
+}
