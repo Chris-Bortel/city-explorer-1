@@ -4,6 +4,7 @@
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg');
 
 // Bring in dotenv package to let us talk to our .env file
 require('dotenv').config();
@@ -13,6 +14,8 @@ const PORT = process.env.PORT || 3000;
 
 // Get an instance of express as our app
 const app = express();
+
+const client = new pg.Client(process.env.DATABASE_URL);
 
 // Enable Cors
 app.use(cors());
@@ -58,7 +61,6 @@ function handleLocation(request, response) {
 
 function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
-  // query string :   ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
