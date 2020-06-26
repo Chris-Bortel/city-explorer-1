@@ -22,10 +22,20 @@ app.get('/', handleHomePage);
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails', handleTrails);
+app.use('*', handleNotFound);
+app.use(errorHandler);
 
+// Initialize the server if database gets connected
+client.connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is up on port ${PORT}.`);
+    });
+  })
+  .catch(err => {
+    throw `PG startup error: ${err.message}`;
+  });
 
-// Initialize the server
-app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
 // In Memory Cache
 let locations = {};
