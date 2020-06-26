@@ -4,6 +4,8 @@
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg');
+const { response } = require('express');
 
 // Bring in dotenv package to let us talk to our .env file
 require('dotenv').config();
@@ -13,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 // Get an instance of express as our app
 const app = express();
+const client = new pg.Client(process.env.DATABASE_URL);
 
 // Enable Cors
 app.use(cors());
@@ -25,7 +28,19 @@ app.get('/trails', handleTrails);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
-// Initialize the server
+// Initialize the server if database gets connected
+client.connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is up on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    throw `Postgress startup error: ${err.message}`;
+  });
+
+
+
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
 
 // In Memory Cache
