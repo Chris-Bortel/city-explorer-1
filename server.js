@@ -32,13 +32,12 @@ app.use(errorHandler);
 client.connect()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is up on port ${PORT}`);
+      console.log(`Server is up on port ${PORT}.`);
     });
   })
   .catch(err => {
-    throw `Postgress startup error: ${err.message}`;
+    throw `PG startup error: ${err.message}`;
   });
-
 
 
 app.listen(PORT, () => console.log('Server is running on port ', PORT));
