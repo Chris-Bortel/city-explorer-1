@@ -48,10 +48,10 @@ function handleLocation(request, response) {
   client.query(SQL, safeQuery)
     .then(results => {
       if (results.rowCount > 0) {
-        console.log('City is Present. result.rows: ', results.rows);
+        console.log('City is Present. result.rows: ', results);
         response.status(200).send(results.rows[0]);
       } else {
-        console.log('City is NOT present. result.rows: ', results.rows);
+        console.log('City is NOT present. result.rows: ', results);
         fetchLocationDataFromAPI(request.query.city, response);
       }
     })

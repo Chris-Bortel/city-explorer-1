@@ -53,3 +53,10 @@ June 18 10:00pm - Application now has functional express server.
 - Start time: 1pm
 - Finish time: 9pm
 - Actual time needed to complete: 8 Hours
+
+## Lab8 Database
+
+- Estimate of time needed to complete: 8 Hours
+- Start time: 1pm
+- Finish time: 9pm
+- Actual time needed to complete: 8 Hours
