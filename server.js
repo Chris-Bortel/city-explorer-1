@@ -56,7 +56,6 @@ function handleLocation(request, response) {
     .catch(error => response.status(500).send(error));
 }
 
-
 function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
 
@@ -76,7 +75,7 @@ function fetchLocationDataFromAPI(city, response) {
 
       client.query(SQL, safeQuery)
         .then(results => {
-          console.log('Added New city into PSQL, This array should be updated:', results.rows);
+          console.log('Added New city into PSQL, This array should be updated:', results);
         });
       response.status(200).send(location);
     })
