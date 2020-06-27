@@ -25,7 +25,7 @@ app.get('/trails', handleTrails);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
-// Initialize the server if database gets connected
+// Connect the Database and Initialize the server
 client.connect()
   .then(() => {
     app.listen(PORT, () => console.log(`Server is up on port ${PORT}.`));
@@ -44,15 +44,14 @@ function handleHomePage(request, response) {
 /////////////////   Location
 function handleLocation(request, response) {
   const safeQuery = [request.query.city];
-  const SQL = 'SELECT * FROM locations WHERE search_query = $1';
+  const SQL = 'SELECT * FROM locations WHERE search_query = $1;';
   client.query(SQL, safeQuery)
     .then(results => {
-      console.log(results);
       if (results.rowCount > 0) {
-        console.log('City is Present');
+        console.log('City is Present. result.rows: ', results.rows);
         response.status(200).send(results.rows[0]);
       } else {
-        console.log('City is NOT present');
+        console.log('City is NOT present. result.rows: ', results.rows);
         fetchLocationDataFromAPI(request.query.city, response);
       }
     })
