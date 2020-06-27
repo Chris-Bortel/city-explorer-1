@@ -48,10 +48,8 @@ function handleLocation(request, response) {
   client.query(SQL, safeQuery)
     .then(results => {
       if (results.rowCount > 0) {
-        console.log('City is Present. result.rows: ', results);
         response.status(200).send(results.rows[0]);
       } else {
-        console.log('City is NOT present. result.rows: ', results);
         fetchLocationDataFromAPI(request.query.city, response);
       }
     })
@@ -73,7 +71,6 @@ function fetchLocationDataFromAPI(city, response) {
     .query(queryObject)
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
-
       const safeQuery = [location.formatted_query, location.latitude, location.longitude, location.search_query];
       const SQL = 'INSERT INTO locations (formatted_query, latitude, longitude, search_query) VALUES ($1, $2, $3, $4);';
 
