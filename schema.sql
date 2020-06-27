@@ -1,3 +1,7 @@
+-- use following in terminal
+-- psql -d city_explorer -f schema.sql
+
+
 DROP TABLE IF EXISTS locations;
 
 CREATE TABLE locations (
@@ -6,4 +10,4 @@ CREATE TABLE locations (
   latitude NUMERIC,
   longitude NUMERIC,
   search_query VARCHAR(255) 
-)
+);
