@@ -1,21 +1,17 @@
 'use strict';
 
-// Bring in npm libraries
+// Bring in npm libraries & configs
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
 const pg = require('pg');
-const { request } = require('express');
-
-// Bring in dotenv package to let us talk to our .env file
 require('dotenv').config();
 
 // Grab port number from .env file
 const PORT = process.env.PORT || 3000;
 
-// Get an instance of express as our app
+// Get an instance of express and postgres
 const app = express();
-
 const client = new pg.Client(process.env.DATABASE_URL);
 
 // Enable Cors
@@ -29,12 +25,10 @@ app.get('/trails', handleTrails);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
-// Initialize the server if database gets connected
+// Connect the Database and Initialize the server
 client.connect()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is up on port ${PORT}.`);
-    });
+    app.listen(PORT, () => console.log(`Server is up on port ${PORT}.`));
   })
   .catch(err => {
     throw `PG startup error: ${err.message}`;
@@ -45,22 +39,19 @@ client.connect()
 function handleHomePage(request, response) {
   response.send('Hello World again. Initial route');
 }
-// let locations = {};
-// if (locations[request.query.city])
 
 
 /////////////////   Location
 function handleLocation(request, response) {
   const safeQuery = [request.query.city];
-  const SQL = 'SELECT * FROM locations WHERE search_query = $1';
+  const SQL = 'SELECT * FROM locations WHERE search_query = $1;';
   client.query(SQL, safeQuery)
     .then(results => {
-      console.log(results);
       if (results.rowCount > 0) {
-        console.log('City is Present');
+        console.log('City is Present. result.rows: ', results);
         response.status(200).send(results.rows[0]);
       } else {
-        console.log('City is NOT present');
+        console.log('City is NOT present. result.rows: ', results);
         fetchLocationDataFromAPI(request.query.city, response);
       }
     })
@@ -83,8 +74,7 @@ function fetchLocationDataFromAPI(city, response) {
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
 
-      // add city info to our database use client query
-      let safeQuery = [location.formatted_query, location.latitude, location.longitude, location.search_query];
+      const safeQuery = [location.formatted_query, location.latitude, location.longitude, location.search_query];
       const SQL = 'INSERT INTO locations (formatted_query, latitude, longitude, search_query) VALUES ($1, $2, $3, $4);';
 
       client.query(SQL, safeQuery)
