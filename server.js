@@ -47,6 +47,7 @@ function handleLocation(request, response) {
   const SQL = 'SELECT * FROM locations WHERE search_query = $1;';
   client.query(SQL, safeQuery)
     .then(results => {
+      // ** Ask if a function is allowed to return true or false here **
       if (results.rowCount > 0) {
         response.status(200).send(results.rows[0]);
       } else {
@@ -76,6 +77,7 @@ function fetchLocationDataFromAPI(city, response) {
       client.query(SQL, safeQuery)
         .then(results => {
           console.log('Added New city into PSQL, This array should be updated:', results);
+          // **** Ask why results does not show correctly here ***
         });
       response.status(200).send(location);
     })
