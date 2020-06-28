@@ -25,6 +25,7 @@ app.get('/trails', handleTrails);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
+
 // Connect the Database and Initialize the server
 client.connect()
   .then(() => {
@@ -48,20 +49,17 @@ function handleLocation(request, response) {
   client.query(SQL, safeQuery)
     .then(results => {
       if (results.rowCount > 0) {
-        console.log('City is Present. result.rows: ', results);
+        console.log('City is Present, results : ', results);
         response.status(200).send(results.rows[0]);
       } else {
-        console.log('City is NOT present. result.rows: ', results);
         fetchLocationDataFromAPI(request.query.city, response);
       }
     })
     .catch(error => response.status(500).send(error));
 }
 
-
 function fetchLocationDataFromAPI(city, response) {
   const API = `https://us1.locationiq.com/v1/search.php`;
-
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
     q: city,
@@ -73,18 +71,24 @@ function fetchLocationDataFromAPI(city, response) {
     .query(queryObject)
     .then((apiData) => {
       let location = new Location(apiData.body[0], city);
-
-      const safeQuery = [location.formatted_query, location.latitude, location.longitude, location.search_query];
-      const SQL = 'INSERT INTO locations (formatted_query, latitude, longitude, search_query) VALUES ($1, $2, $3, $4);';
-
-      client.query(SQL, safeQuery)
-        .then(results => {
-          console.log('Added New city into PSQL, This array should be updated:', results.rows);
-        });
+      cacheLocationToDataBase(location);
       response.status(200).send(location);
     })
     .catch(() => {
       response.status(500).send('Something went wrong in LOCATION Route using superagent');
+    });
+}
+
+function cacheLocationToDataBase(locationObj) {
+  const safeQuery1 = [locationObj.formatted_query, locationObj.latitude, locationObj.longitude, locationObj.search_query];
+  const SQL1 = `
+      INSERT INTO locations (formatted_query, latitude, longitude, search_query) 
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;`;
+
+  client.query(SQL1, safeQuery1)
+    .then(results => {
+      console.log('Added New city into PSQL, This array should be updated:', results);
     });
 }
 
