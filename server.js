@@ -49,7 +49,7 @@ function handleLocation(request, response) {
   client.query(SQL, safeQuery)
     .then(results => {
       if (results.rowCount > 0) {
-        console.log('City is Present, results : ', results);
+        console.log('City is Present, results : ', results.rows);
         response.status(200).send(results.rows[0]);
       } else {
         fetchLocationDataFromAPI(request.query.city, response);
@@ -88,7 +88,7 @@ function cacheLocationToDataBase(locationObj) {
 
   client.query(SQL1, safeQuery1)
     .then(results => {
-      console.log('Added New city into PSQL, This array should be updated:', results);
+      console.log('Added New city into PSQL, This array should be updated:', results.rows);
     });
 }
 
