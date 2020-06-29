@@ -23,6 +23,7 @@ app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails', handleTrails);
 app.get('/movies', handleMovies);
+app.get('/yelp', handleYelp);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
@@ -163,7 +164,7 @@ function Trails(obj) {
 }
 
 
-////////////// Movies
+////////////////   Movies
 function handleMovies(request, response) {
   const API = 'https://api.themoviedb.org/3/search/movie';
   let queryObj = {
@@ -189,6 +190,35 @@ function Movies(obj) {
   this.image_url = `https://image.tmdb.org/t/p/w500${obj.poster_path}`;
   this.popularity = obj.popularity;
   this.released_on = obj.release_date;
+}
+
+
+/////////////////  Yelp
+function handleYelp(request, response) {
+  let API = 'https://api.yelp.com/v3/businesses/search';
+  let queryObj = {
+    term: 'restaurants',
+    latitude: request.query.latitude,
+    longitude: request.query.longitude
+  };
+
+  superagent
+    .get(API)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .query(queryObj)
+    .then((apiData) => {
+      let restaurantArr = apiData.body.businesses.map(restaurant => new Restaurants(restaurant));
+      response.status(200).send(restaurantArr);
+    })
+    .catch(() => response.status(500).send('Something wrong with YELP route'));
+}
+
+function Restaurants(obj) {
+  this.name = obj.name;
+  this.image_url = obj.image_url;
+  this.price = obj.price;
+  this.rating = obj.rating;
+  this.url = obj.url;
 }
 
 function handleNotFound(request, response) {
