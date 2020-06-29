@@ -22,6 +22,7 @@ app.get('/', handleHomePage);
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails', handleTrails);
+app.get('/movies', handleMovies);
 app.use('*', handleNotFound);
 app.use(errorHandler);
 
@@ -48,8 +49,7 @@ function handleLocation(request, response) {
   const SQL = 'SELECT * FROM locations WHERE search_query = $1;';
   client.query(SQL, safeQuery)
     .then(results => {
-      if (results.rowCount > 0) {
-        console.log('City is Present, results : ', results.rows);
+      if (results.rowCount) {
         response.status(200).send(results.rows[0]);
       } else {
         fetchLocationDataFromAPI(request.query.city, response);
@@ -85,11 +85,8 @@ function cacheLocationToDataBase(locationObj) {
       INSERT INTO locations (formatted_query, latitude, longitude, search_query) 
       VALUES ($1, $2, $3, $4)
       RETURNING *;`;
-
   client.query(SQL1, safeQuery1)
-    .then(results => {
-      console.log('Added New city into PSQL, This array should be updated:', results.rows);
-    });
+    .then(results => console.log('New City has been added to PSQL Database: ', results.rows[0]));
 }
 
 function Location(obj, city) {
@@ -165,6 +162,34 @@ function Trails(obj) {
   this.condition_time = obj.conditionDate.slice(obj.conditionDate.indexOf(' '));
 }
 
+
+////////////// Movies
+function handleMovies(request, response) {
+  const API = 'https://api.themoviedb.org/3/search/movie';
+  let queryObj = {
+    query: request.query.search_query,
+    api_key: process.env.MOVIE_API_KEY
+  };
+
+  superagent
+    .get(API)
+    .query(queryObj)
+    .then(apiData => {
+      let moviesArr = apiData.body.results.map(movies => new Movies(movies));
+      response.status(200).send(moviesArr);
+    })
+    .catch(() => response.status(500).send('Something wrong with MOVIES route'));
+}
+
+function Movies(obj) {
+  this.title = obj.title;
+  this.overview = obj.overview;
+  this.average_votes = obj.vote_average;
+  this.total_votes = obj.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500${obj.poster_path}`;
+  this.popularity = obj.popularity;
+  this.released_on = obj.release_date;
+}
 
 function handleNotFound(request, response) {
   response.status(404).send('Route not found');
