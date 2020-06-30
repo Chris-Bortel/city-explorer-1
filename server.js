@@ -199,7 +199,9 @@ function handleYelp(request, response) {
   let queryObj = {
     term: 'restaurants',
     latitude: request.query.latitude,
-    longitude: request.query.longitude
+    longitude: request.query.longitude,
+    limit: 5,
+    offset: (request.query.page - 1) * 5
   };
 
   superagent
@@ -207,6 +209,7 @@ function handleYelp(request, response) {
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .query(queryObj)
     .then((apiData) => {
+      console.log('First console log from request', request.query);
       let restaurantArr = apiData.body.businesses.map(restaurant => new Restaurants(restaurant));
       response.status(200).send(restaurantArr);
     })
